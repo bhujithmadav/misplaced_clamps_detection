@@ -1,4 +1,14 @@
-from fastapi import FastAPI, File, UploadFile
+'''
+This API is used for comparing clamp images and finding out defects. Steps are as follows:
+  1. Upload a clamp image to the API
+  2. Image of a perfect clamp i.e not defective clamp will be fetched from local
+  3. Siamese Network compares the difference between the images
+  4a. If the difference/distance is very small then the input image should also be similar to local image 
+      i.e clamp in input image should also most probably not be defective
+  4b. If the difference/distance is large then the input image is not similar to the local image
+      i.e clamp in input image should be defective
+'''
+from fastapi import FastAPI, File, UploadFile, Form
 #import tensorflow as tf
 import numpy as np
 from tensorflow.keras.models import Model,load_model
