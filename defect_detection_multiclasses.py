@@ -11,6 +11,7 @@ This API is used for comparing images belonging to multiple classes and finding 
 from fastapi import FastAPI, File, UploadFile, Form, Depends, HTTPException
 from pydantic import BaseModel, validator
 #import tensorflow as tf
+import os
 import numpy as np
 from tensorflow.keras.models import Model,load_model
 from tensorflow.keras.layers import Layer
@@ -90,7 +91,15 @@ async def upload_image(image_input: ImageInput = Depends(perform_validation)):
     img_extension = ".jpeg"
     val_img_filename = val_img_type + img_extension
 
-    val_img_path = f"multi_classes_images/{val_img_filename}"
-    result = prediction(input_img_path, val_img_path, image_input.input_text)
+    val_img_path = f"multi_classes_images/{val_img_type}/"
+
+    results = []
+    for path in os.listdir(val_img_path):
+      val_path = f"multi_classes_images/{val_img_type}/{path}"
+      result = prediction(input_img_path, val_path, image_input.input_text)
+      results.append(result)
+    print(results)
+    label = "Not Defective" if results.count("Not Defective") >= results.count("Defective") else "Defective" 
+    
     #return {"filename": file.filename}
-    return {"filename": image_input.file.filename, "category":image_input.input_text , "prediction":str(result)}
+    return {"filename": image_input.file.filename, "category":image_input.input_text , "prediction":str(label)}
