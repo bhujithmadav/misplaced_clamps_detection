@@ -57,7 +57,7 @@ class L1Dist(Layer):
   
 binary_cross_loss = BinaryCrossentropy()
 
-model = load_model('multiple_classes_defect_detection_new.h5',
+model = load_model('multiple_classes_defect_detection.h5',
                     custom_objects={'L1Dist':L1Dist,'binary_cross_loss':BinaryCrossentropy})
 
 app = FastAPI()
