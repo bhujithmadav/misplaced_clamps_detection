@@ -29,6 +29,7 @@ def preprocess(file_path):
   except InvalidArgumentError:
     img = uniform([250, 250, 3], minval=0, maxval=256)
   img = resize(img,(100,100))
+  img = img[:, :, :3]
   img = img/255.0
   return img
 
@@ -56,7 +57,7 @@ class L1Dist(Layer):
   
 binary_cross_loss = BinaryCrossentropy()
 
-model = load_model('multiple_classes_defect_detection.h5',
+model = load_model('multiple_classes_defect_detection_new.h5',
                     custom_objects={'L1Dist':L1Dist,'binary_cross_loss':BinaryCrossentropy})
 
 app = FastAPI()
@@ -67,7 +68,7 @@ class ImageInput(BaseModel):
 
     @validator("input_text")
     def validate_input_text(cls, value):
-        allowed_values = {'fire_extinguisher','grid','layout','power_eco','top3','dashboard','dup','mic','two'}
+        allowed_values = {'fe','grid','four','eco_power','top','lights'}
         if value.lower() not in allowed_values:
             error = "Input should be one among the following ['fire_extinguisher','grid','layout','power_eco','top3','dashboard','dup','mic','two']"
             raise HTTPException(status_code=422, detail=str(error))
