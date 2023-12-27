@@ -67,10 +67,10 @@ class ImageInput(BaseModel):
     input_text: str = Form(...)
 
     @validator("input_text")
-    def validate_input_text(cls, value):
-        allowed_values = {'fe','grid','four','eco_power','top','lights'}
+    def validate_input_text(cls, value): 
+        allowed_values = {'ps_fe', 'ps_grid', 'ps_lights', 'ps_four', 'ps_top', 'ps_eco_power'}
         if value.lower() not in allowed_values:
-            error = "Input should be one among the following ['fire_extinguisher','grid','layout','power_eco','top3','dashboard','dup','mic','two']"
+            error = "Input should be one among the following ['ps_fe', 'ps_grid', 'ps_lights', 'ps_four', 'ps_top', 'ps_eco_power']"
             raise HTTPException(status_code=422, detail=str(error))
         return value.lower()
 
