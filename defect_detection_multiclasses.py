@@ -36,15 +36,14 @@ def preprocess(file_path):
 def prediction(input_img_path, val_img_path, input_category):
   input_img = preprocess(input_img_path)
   val_img = preprocess(val_img_path)
-  result = model.predict(list(np.expand_dims([input_img,val_img],axis=1)))
+  result = model.predict(list(np.expand_dims([input_img, val_img],axis=1)))
   print(result)
-  if result>0.5:
+  if result>=0.4:
     print(f"{input_category} switch component is not defective")
     return 'Not Defective'
   else:
     print(f"{input_category} switch component is defective")
     return 'Defective'
-
 
 ## Reload the model
 ## Not using the custom_objects will trigger errors
@@ -67,10 +66,10 @@ class ImageInput(BaseModel):
     input_text: str = Form(...)
 
     @validator("input_text")
-    def validate_input_text(cls, value): 
-        allowed_values = {'ps_fe', 'ps_grid', 'ps_lights', 'ps_four', 'ps_top', 'ps_eco_power'}
+    def validate_input_text(cls, value):
+        allowed_values = {'ps_lights', 'ps_fe', 'ps_grid', 'ps_pe', 'ps_four', 'ps_top', 'dashboard', 'dup', 'layout', 'grid', 'two'}
         if value.lower() not in allowed_values:
-            error = "Input should be one among the following ['ps_fe', 'ps_grid', 'ps_lights', 'ps_four', 'ps_top', 'ps_eco_power']"
+            error = "Input should be one among the following ['ps_lights', 'ps_fe', 'ps_grid', 'ps_pe', 'ps_four', 'ps_top', 'dashboard', 'dup', 'layout', 'grid', 'two']"
             raise HTTPException(status_code=422, detail=str(error))
         return value.lower()
 
@@ -97,10 +96,10 @@ async def upload_image(image_input: ImageInput = Depends(perform_validation)):
     results = []
     for path in os.listdir(val_img_path):
       val_path = f"multi_classes_images/{val_img_type}/{path}"
-      result = prediction(input_img_path, val_path, image_input.input_text)
-      results.append(result)
+      res = prediction(val_path, input_img_path, image_input.input_text)
+      results.append(res)
     print(results)
-    label = "Not Defective" if results.count("Not Defective") >= results.count("Defective") else "Defective" 
+    label = "Not Defective" if results.count("Not Defective") > results.count("Defective") else "Defective" 
     
     #return {"filename": file.filename}
     return {"filename": image_input.file.filename, "category":image_input.input_text , "prediction":str(label)}
